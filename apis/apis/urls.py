@@ -24,10 +24,10 @@ application URLS--> project
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
-    path('api_crud/user/',include("users.urls")),
 
-    path('api_crud/user_contact/',include("user_contacts.urls")),
-    
-    path('search/', include("search_engine.urls")),
+    path('crud-api/', include("users.urls")),
+
+    # path('user_contact/', include("user_contacts.urls")),
+
+    path('search-api/', include("search_engine.urls")),
 ]

@@ -1,12 +1,12 @@
-from django.urls import path, include
-from .views import Search_by_name
+from django.urls import path
+from .views import ListUserAPIView
+from .views import ListUserContactAPIView
 
-"""
-application URLS--> serach_engine
-"""
+""" URLS --> serach_engine """
+
 
 urlpatterns = [
-    path('by_name/', Search_by_name.as_view()),
-    
-    # path('by_number/', ),
+    path('contact/', ListUserContactAPIView.as_view()),
+
+    path('user/', ListUserAPIView.as_view()),
 ]

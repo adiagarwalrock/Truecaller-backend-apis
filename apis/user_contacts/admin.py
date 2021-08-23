@@ -1,4 +1,9 @@
-from django.contrib import admin
-from .models import UserContacts
+# from django.contrib import admin
+# from .models import UserContact
 
-admin.site.register(UserContacts)
+# # admin.site.register(UserContact)
+
+
+# @admin.register(UserContact)
+# class UserContactAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'name', 'phone', 'email', 'spam_liklihood']

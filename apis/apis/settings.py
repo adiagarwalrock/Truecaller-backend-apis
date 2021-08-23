@@ -100,8 +100,8 @@ DATABASES = {
 # For MYSQL
 # import pymysql
 # pymysql.install_as_MySQLdb()
-# import MySQLdb 
-# 
+# import MySQLdb
+#
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
