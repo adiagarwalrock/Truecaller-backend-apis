@@ -27,7 +27,5 @@ urlpatterns = [
 
     path('crud-api/', include("users.urls")),
 
-    # path('user_contact/', include("user_contacts.urls")),
-
     path('search-api/', include("search_engine.urls")),
 ]

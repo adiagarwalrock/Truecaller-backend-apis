@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     # 'rest_framework.authtoken',
     'phonenumber_field',
     'users',
-    'user_contacts',
     'search_engine',
 ]
 
