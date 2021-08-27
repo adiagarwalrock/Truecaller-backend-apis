@@ -1,20 +1,19 @@
+from django.db.models import F
 import io
 from django.http.response import JsonResponse
-from rest_framework.response import Response
+from django.views.decorators.http import require_POST
 
-from .serializers import UserContactSerializer
-from .serializers import UserSerializer
-
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
-from rest_framework.filters import SearchFilter                 # Search
-# from rest_framework.response import Response
-from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
 
+from .serializers import UserContactSerializer, UserSerializer
 from .models import User, UserContact
 
-'''User --> Views'''
+
+'''####################'''
+'''USER'''
+'''####################'''
 
 
 @api_view(['GET'])
@@ -35,6 +34,7 @@ def list_user_view(request, pk=None):
 
 @api_view(['PUT'])
 def update_user_view(request, pk):
+    # Updates any user field by referencing the user-id
     if request.method == 'PUT':
         user = User.objects.get(pk=pk)
         user_data = JSONParser().parse(request)
@@ -47,19 +47,25 @@ def update_user_view(request, pk):
         return JsonResponse({'message': 'User could not be updated successfully!', 'request_type': 'PUT', 'function': 'update_user_view'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class CreateUserAPIView(CreateAPIView):
+class CreateUserAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
-class UpdateUserAPIView(UpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+@api_view(['DELETE'])
+def delete_user_view(request, pk):
+    if request.method == 'DELETE':
+        try:
+            user = User.objects.get(pk=pk)
+            user.delete()
+            return JsonResponse({'message': 'User deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+        except User.DoesNotExist:
+            return JsonResponse({'message': 'User does not exist', 'request_type': 'DELETE', 'function': 'delete_user_view'}, status=status.HTTP_404_NOT_FOUND)
 
 
-class DeleteUserAPIView(DestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+'''####################'''
+''' CONTACTS'''
+'''####################'''
 
 
 @api_view(['GET'])
@@ -78,14 +84,25 @@ def list_contact_view(request, pk=None):
             return JsonResponse(contact_serializer.data, safe=False, status=status.HTTP_302_FOUND)
 
 
-class CreateUserContactAPIView(CreateAPIView):
+class CreateUserContactAPIView(generics.CreateAPIView):
     queryset = UserContact.objects.all()
     serializer_class = UserContactSerializer
 
 
-class UpdateUserContactAPIView(UpdateAPIView):
-    queryset = UserContact.objects.all()
-    serializer_class = UserContactSerializer
+@api_view(['PUT'])
+def update_contact_view(request, pk):
+    # Updates any contact field by referencing the user-id
+    if request.method == 'PUT':
+        contact = UserContact.objects.get(pk=pk)
+        contact_data = JSONParser().parse(request)
+
+        contact_serializer = UserContactSerializer(
+            contact, partial=True, data=contact_data)
+
+        if contact_serializer.is_valid():
+            contact_serializer.save()
+            return JsonResponse({'message': 'contact was updated successfully!'}, status=status.HTTP_200_OK)
+        return JsonResponse({'message': 'contact could not be updated successfully!', 'request_type': 'PUT', 'function': 'update_user_view'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['DELETE'])
@@ -94,33 +111,23 @@ def delete_contact_api_view(request, pk):
         try:
             contact = UserContact.objects.get(pk=pk)
             contact.delete()
-            return JsonResponse({'message': 'User was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+            return JsonResponse({'message': 'Contact was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
         except UserContact.DoesNotExist:
-            return JsonResponse({'message': 'DELETE--> The User does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            return JsonResponse({'message': 'Contact does not exist', 'request_type': 'DELETE', 'function': 'delete_contact_view'}, status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['GET', 'PUT'])
+'''####################'''
+'''MARK SPAM'''
+'''####################'''
+
+
+@api_view(['PATCH', 'GET'])
 def mark_spam_view(request, pk):
-    # print(type(request))
-    # print("REQUEST: ", type(request.data))
-    # request["data"] = {"spam_liklihood": 99}
-
+    UserContact.objects.filter(pk=pk).update(
+        spam_liklihood=F('spam_liklihood')+1)
     try:
         contact = UserContact.objects.get(pk=pk)
-        print("contact: ", contact)
-
+        contact_serializer = UserContactSerializer(contact)
+        return JsonResponse(contact_serializer.data, status=status.HTTP_302_FOUND)
     except UserContact.DoesNotExist:
-        return JsonResponse({'message': 'The User does not exist'}, status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'PUT':
-        contact_data = JSONParser().parse(request)
-
-        contact_serializer = UserContactSerializer(
-            contact, data=contact_data)
-        # print(contact_serializer, contact_data)
-        print("T&F: ", contact_serializer.is_valid())
-
-        if contact_serializer.is_valid():
-            contact_serializer.save()
-            return JsonResponse(contact_serializer.data)
-        return JsonResponse(contact_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({'message': 'The contact does not exist', 'request_type': 'GET', 'function': 'mark_spam_view'}, status=status.HTTP_404_NOT_FOUND)

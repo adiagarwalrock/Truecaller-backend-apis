@@ -4,7 +4,7 @@
 *To create a REST api to be consumed by a mobile app, which is somewhat similar to various popular apps which tell if a number is spam, or allow user to find a person’s name by searching for their phone number.*
 
 
-## Terminology and assumptions:
+## Terminology:
 - Each registered user of the app can have zero or more personal “contacts”.
 - The `global database` is basically the combination of all the registered users and their personal contacts (who may or may not be registered users).
 
@@ -29,11 +29,13 @@
 
 
 ## Search:
-- A user can search for a person by name in the global database. Search results display the name, phone number and spam likelihood for each result matching that name completely or partially. Results should first show people whose names start with the search query, and then people whose names contain but don’t start with the search query.
-
-- A user can search for a person by phone number in the global database. If there is a registered user with that phone number, show only that result. Otherwise, show all results matching that phone number completely
-    - note that there can be multiple names for a particular phone number in the global database, since contact books of multiple registered users may have different names for the same phone number.
-- Clicking a search result displays all the details for that person along with the spam likelihood. But the person’s email is only displayed if the person is a registered user and the user who is searching is in the person’s contact list.
+1. A user can search for a person by name in the global database. 
+   1. Search results display the name, phone number and spam likelihood for each result matching that name completely or partially. 
+   2. Results should first show people whose names start with the search query, and then people whose names contain but don’t start with the search query.
+2. A user can search for a person by phone number in the global database. If there is a registered user with that phone number, show only that result. Otherwise, show all results matching that phone number completely.
+  
+        Note: that there can be multiple names for a particular phone number in the global database, since contact books of multiple registered users may have different names for the same phone number.
+3. Clicking a search result displays all the details for that person along with the spam likelihood. But the person’s email is only displayed if the person is a registered user and the user who is searching is in the person’s contact list.
 
 
 ## Data Population:
